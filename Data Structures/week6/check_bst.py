@@ -1,5 +1,11 @@
 # python3
 
+import sys
+import threading
+
+sys.setrecursionlimit(10**6)  # max depth of recursion
+threading.stack_size(2**27)  # new thread will get stack of such size
+
 
 class Node:
     def __init__(self, key=None, left=None, right=None):
@@ -8,42 +14,25 @@ class Node:
         self.right = right
 
 
-def in_order(node):
-    if not node:
-        return
-
-    in_order(node.left)
-
-    if (not node.left and node.key < node.right.key) \
-            or (node.left.key < node.key and not node.right) \
-            or (node.left.key < node.key < node.right.key):
-        pass
+def in_order(node, min_value, max_value):
+    result = True
+    if min_value < node.key < max_value:
+        if node.left:
+            result = result and in_order(node.left, min_value, node.key)
+        if node.right:
+            result = result and in_order(node.right, node.key, max_value)
     else:
-        return False
+        result = False
 
-    in_order(node.right)
-
-
-def pre_order(node):
-    if not node:
-        return
-
-    print(node.key, end=' ')
-    pre_order(node.left)
-    pre_order(node.right)
+    return result
 
 
-def post_order(node):
-    if not node:
-        return
-
-    post_order(node.left)
-    post_order(node.right)
-    print(node.key, end=' ')
-
-
-if __name__ == "__main__":
+def main():
     n = int(input())
+    if n == 0:
+        print('CORRECT')
+        sys.exit()
+
     nodes = [Node() for i in range(n)]
     for i in range(n):
         key, left, right = [int(j) for j in input().split()]
@@ -59,9 +48,9 @@ if __name__ == "__main__":
         else:
             nodes[i].right = nodes[right]
 
-    in_order(nodes[0])
-    print()
-    pre_order(nodes[0])
-    print()
-    post_order(nodes[0])
-    print()
+    if in_order(nodes[0], float('-inf'), float('inf')):
+        print('CORRECT')
+    else:
+        print('INCORRECT')
+
+threading.Thread(target=main).start()

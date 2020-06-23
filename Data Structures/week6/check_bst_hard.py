@@ -14,35 +14,25 @@ class Node:
         self.right = right
 
 
-def in_order(node):
-    if not node:
-        return
+def in_order(node, min_value, max_value):
+    result = True
+    if min_value <= node.key < max_value:
+        if node.left:
+            result = result and in_order(node.left, min_value, node.key)
+        if node.right:
+            result = result and in_order(node.right, node.key, max_value)
+    else:
+        result = False
 
-    in_order(node.left)
-    print(node.key, end=' ')
-    in_order(node.right)
-
-
-def pre_order(node):
-    if not node:
-        return
-
-    print(node.key, end=' ')
-    pre_order(node.left)
-    pre_order(node.right)
-
-
-def post_order(node):
-    if not node:
-        return
-
-    post_order(node.left)
-    post_order(node.right)
-    print(node.key, end=' ')
+    return result
 
 
 def main():
     n = int(input())
+    if n == 0:
+        print('CORRECT')
+        sys.exit()
+
     nodes = [Node() for i in range(n)]
     for i in range(n):
         key, left, right = [int(j) for j in input().split()]
@@ -58,12 +48,9 @@ def main():
         else:
             nodes[i].right = nodes[right]
 
-    in_order(nodes[0])
-    print()
-    pre_order(nodes[0])
-    print()
-    post_order(nodes[0])
-    print()
-
+    if in_order(nodes[0], float('-inf'), float('inf')):
+        print('CORRECT')
+    else:
+        print('INCORRECT')
 
 threading.Thread(target=main).start()
